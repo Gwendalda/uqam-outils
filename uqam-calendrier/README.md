@@ -19,4 +19,33 @@ Cet outil permet d'exporter plus facilement le calendrier des horaires de cours 
 3. Exécutez la commande `pip install -r requirements.txt` pour installer les dépendances.
 4. Exécutez la commande `python uqam-calendrier.py` et suivez les instructions à l'écran.
 5. Le fichier `uqam-calendrier.ics` sera créé dans le dossier où vous avez placé le fichier `uqam-calendrier.py`.
+6. Importez le fichier `uqam-calendrier.ics` dans votre calendrier préféré.
 
+## Import de fichiers .ics
+
+### Google Calendar
+
+1. Dans Google Calendar, cliquez sur settings.
+2. Cliquez sur "Import & Export".
+3. Choisir "Import from file".
+4. Sélectionnez le fichier `uqam-calendrier.ics` et cliquez sur "Import".
+
+
+### Apple Calendar
+
+1. Ouvrez iCal. et cliquez sur "File" puis "Import".
+2. Sélectionnez le fichier `uqam-calendrier.ics` et cliquez sur "Import".
+3. Sélectionnez "Import all events" et cliquez sur "Import".
+
+### Outlook
+
+1. Dans Outlook, cliquez sur "File" puis "Open & Export".
+2. Cliquez sur "Import/Export".
+3. Sélectionnez "Import an iCalendar (.ics) or vCalendar (.vcs) file" et cliquez sur "Next".
+4. Sélectionnez le fichier `uqam-calendrier.ics` et cliquez sur "Next".
+5. Sélectionnez "Import all items" et cliquez sur "Finish".
+
+
+### Autres calendriers
+
+Consultez la documentation de votre calendrier pour savoir comment importer un fichier .ics.
