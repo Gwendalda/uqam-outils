@@ -16,6 +16,7 @@ Cet outil permet d'exporter plus facilement le calendrier des horaires de cours 
 
 1. Téléchargez le fichier `uqam-calendrier.py` et placez-le dans un dossier vide.
 2. Lancez un terminal et placez-vous dans le dossier où vous avez placé le fichier `uqam-calendrier.py`.
-3. Exécutez la commande `python uqam-calendrier.py` et suivez les instructions à l'écran.
-4. Le fichier `uqam-calendrier.ics` sera créé dans le dossier où vous avez placé le fichier `uqam-calendrier.py`.
+3. Exécutez la commande `pip install -r requirements.txt` pour installer les dépendances.
+4. Exécutez la commande `python uqam-calendrier.py` et suivez les instructions à l'écran.
+5. Le fichier `uqam-calendrier.ics` sera créé dans le dossier où vous avez placé le fichier `uqam-calendrier.py`.
 
