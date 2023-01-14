@@ -5,41 +5,52 @@ from selenium.webdriver.chrome.options import Options
 from dateparser import parse
 import os
 import uuid
+from config import *
 
 
 class EvenementCalendrier:
     def __init__(self, titre:str, type:str, local:str, heure:str, jour:str, fin_de_session:str):
         self.titre = titre.replace(" ", "_")
-        self.date_debut = parse(date_string=heure.split("-")[0] + " " + jour, languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
-        self.date_fin = parse(date_string=heure.split("-")[1] + " " + jour, languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
+        self.date_debut = parse(date_string=heure.split("-")[0] + " " + jour,
+                                languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
+        self.date_fin = parse(date_string=heure.split("-")[1] + " " + jour,
+                              languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
         self.local = local.replace(" ", "_")
         self.type = type.replace(" ", "_")
-        self.fin_de_session = parse(fin_de_session, languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
+        self.fin_de_session = parse(fin_de_session,
+                                    languages=['fr'], settings={'TIMEZONE': 'America/Montreal'})
 
     def __str__(self):
-        return self.titre + " " + str(self.date_debut.strftime("Le %A")) + " de " + str(self.date_debut.strftime("%H:%M")) + " à " + str(self.date_fin.strftime("%H:%M")) + " " + self.local + " " + self.type
+        return self.titre + " " + \
+               str(self.date_debut.strftime("Le %A")) + " de " + \
+               str(self.date_debut.strftime("%H:%M")) + " à " + \
+               str(self.date_fin.strftime("%H:%M")) + " " + \
+               self.local + " " + self.type
 
     def __repr__(self):
         return self.__str__()
 
     def __dict__(self):
-        return {"titre": self.titre, "date_debut": self.date_debut.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "date_fin": self.date_fin.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "local": self.local, "type": self.type}
+        return {
+            "titre": self.titre,
+            "date_debut": self.date_debut.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            "date_fin": self.date_fin.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            "local": self.local,
+            "type": self.type
+        }
 
-    def get_google_calendar_link(self):
-        # make a google calendar link in this format : "https://calendar.google.com/calendar/render?action=TEMPLATE&dates=20230113T180000Z%2F20230113T180000Z&details=&location=&text="
-        return "https://calendar.google.com/calendar/render?action=TEMPLATE&dates=" + self.date_debut.strftime("%Y%m%dT%H%M%SZ") + "%2F" + self.date_fin.strftime("%Y%m%dT%H%M%SZ") + "&details=" + self.type + "&location=" + self.local + "&text=" + self.titre
-
-    def get_outlook_calendar_link(self):
-        # produce a link in this format : https://outlook.live.com/calendar/0/deeplink/compose?body=Prout%0A&enddt=2023-01-13T18%3A30%3A00%2B00%3A00&location=sh3421&path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&startdt=2023-01-13T17%3A00%3A00%2B00%3A00&subject=INF3105
-        return "https://outlook.live.com/calendar/0/deeplink/compose?body=" + self.type + "%0A&enddt=" + self.date_fin.strftime("%Y-%m-%dT%H%3A%M%3A%S%2B00%3A00") + "&location=" + self.local + "&path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&startdt=" + self.date_debut.strftime("%Y-%m-%dT%H%3A%M%3A%S%2B00%3A00") + "&subject=" + self.titre
-
-    def get_ics_link_text(self):
-        return "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//uqam-outils//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:" + str(uuid.uuid4()) + "\nDTSTART;TZID=America/Montreal:" + self.date_debut.strftime("%Y%m%dT%H%M%S") + "\nDTEND;TZID=America/Montreal:" + self.date_fin.strftime("%Y%m%dT%H%M%S") + "\nSUMMARY:" + self.titre + "\nDESCRIPTION:" + self.type + "\nLOCATION:" + self.local + f"\nRRULE:FREQ=WEEKLY;UNTIL={self.fin_de_session.strftime('%Y%m%dT000000Z')}" +"\nEND:VEVENT\nEND:VCALENDAR"
+    def get_ics_text(self):
+        return "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//uqam-outils//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:" + \
+               str(uuid.uuid4()) + "\nDTSTART;TZID=America/Montreal:" + self.date_debut.strftime("%Y%m%dT%H%M%S") + \
+               "\nDTEND;TZID=America/Montreal:" + self.date_fin.strftime("%Y%m%dT%H%M%S") + "\nSUMMARY:" + self.titre + \
+               "\nDESCRIPTION:" + self.type + "\nLOCATION:" + self.local + \
+               f"\nRRULE:FREQ=WEEKLY;UNTIL={self.fin_de_session.strftime('%Y%m%dT000000Z')}" + \
+               "\nEND:VEVENT\nEND:VCALENDAR"
 
     def produce_ics_file(self):
         # make a file with a name based on the title of the event
-        with open(self.titre + self.type + ".ics", "w+") as f:
-            f.write(self.get_ics_link_text())
+        with open("uqam-calendrier" + self.titre + self.type + ".ics", "w+") as f:
+            f.write(self.get_ics_text())
 
 
 def combine_ics_files():
@@ -72,38 +83,32 @@ def get_evenements(codePermanent, motDePasse):
     username.send_keys(codePermanent)
     passwrd.send_keys(motDePasse)
     driver.execute_script("arguments[0].click();", driver.find_element(By.XPATH, "//button[@type='submit']"))
-    time.sleep(1)
+    time.sleep(TIME_MULTIPLIER*1)
     driver.get("https://www.portailetudiant.uqam.ca/calendrier")
-    time.sleep(1)
+    time.sleep(TIME_MULTIPLIER*1)
     listeEvenements = []
     listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
     jour = 0
     for element in driver.find_elements(By.XPATH, "//div[@class='fc-event-container']"):
         for cours in element.find_elements(By.TAG_NAME, "a"):
             driver.execute_script("arguments[0].click();", cours)
-            time.sleep(0.2)
+            time.sleep(TIME_MULTIPLIER*0.2)
             fin_de_session = driver.find_element(By.XPATH,
                                 "/html/body/div/div/div[2]/div[2]/div[2]/div[2]/div/div[2]/table/tbody/tr[4]/td/div[1]/div[1]/table/tbody/tr[3]/td[2]/p[1]").text.split("au")[1].strip()
             driver.execute_script("arguments[0].click();", driver.find_element(By.XPATH, "//button[text()='Retour au calendrier']"))
-            time.sleep(0.2)
+            time.sleep(TIME_MULTIPLIER*0.2)
             listeEvenements.append(EvenementCalendrier(cours.find_element(By.CLASS_NAME, "fc-title").text, cours.find_element(By.CLASS_NAME, "coursType").text, cours.find_element(By.CLASS_NAME, "coursLocal").text, cours.find_element(By.CLASS_NAME, "customTime").text, listeJours[jour], fin_de_session))
         jour += 1
     driver.close()
     return listeEvenements
 
+
 def main():
-    codePermanent = input("Code permanent : ")
-    motDePasse = input("Mot de passe : ")
+    codePermanent = input("Code permanent: ")
+    motDePasse = input("Mot de passe: ")
     listeEvenements = get_evenements(codePermanent, motDePasse)
-    list_of_links = []
     for evenement in listeEvenements:
         evenement.produce_ics_file()
-        list_of_links.append(evenement.get_google_calendar_link())
-        list_of_links.append(evenement.get_outlook_calendar_link())
-    with open("links.txt", "w+") as f:
-        for i in list_of_links:
-            f.write(i)
-            f.write("\n")
     combine_ics_files()
     # remove all ics files except the combined one
     for file in os.listdir():
